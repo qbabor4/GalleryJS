@@ -1,0 +1,258 @@
+<!DOCTYPE HTML>
+<head>
+	<meta http-equiv="content-type" content="text/html" />
+	<meta name="author" content="lolkittens" />
+    <meta charset="UTF-8" />
+	<title>Photo Gallery script</title>
+    
+ <style type="text/css">
+body {
+	background: #222;
+	margin: 0;
+    color: #ccc;
+}
+h3 {
+    text-align:center;
+}
+.thumbnails img {
+	height: 60px;
+	border: 4px solid #555;
+	padding: 1px;
+	margin: 0 10px 10px 0;
+}
+.thumbnails img:hover {
+	border: 4px solid #00ccff;
+	cursor:pointer;
+}
+
+.preview img { 
+    display: block;
+	border: 4px solid #444;
+	padding: 1px;
+	width: 800px;
+    margin: 0 auto;
+    
+}
+.selected {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    position: fixed;
+    top: 0;
+    left: 0;  
+    display:none;  
+}
+.arrowImg {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    width: 938px; 
+    margin-top: -225px;  
+    margin-left: -455px; 
+}
+
+.arrowImg img {
+    -webkit-user-select: none; /* Chrome/Safari brak poswietlania na niebiesko*/       
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+ */
+    float:left;
+    /*margin-left: 15px; */
+    width:800px;
+	border: 4px solid #444;
+	padding: 1px;
+    opacity: 1;
+}
+
+.arrow-right {
+    float:left; 
+    margin-top: 125px;
+    width: 0; 
+    height: 0; 
+    border-top: 100px solid transparent;
+    border-bottom: 100px solid transparent;
+    border-left: 50px solid rgba(204,204,204,.5);
+}
+
+.arrow-left {
+    float:left; 
+    margin-top: 125px;
+    width: 0; 
+    height: 0; 
+    border-top: 100px solid transparent;
+    border-bottom: 100px solid transparent; 
+    border-right:50px solid rgba(204,204,204,.5); 
+}
+
+.arrow-in-left {
+    margin-left:-24px;
+    margin-top: 175px;
+    border-top: 50px solid transparent;
+    border-bottom: 50px solid transparent; 
+    border-right:25px solid rgba(40,40,40,1); 
+}
+
+.arrow-in-right {
+    margin-left:-50px; 
+    margin-top: 175px;
+    border-top: 50px solid transparent;
+    border-bottom: 50px solid transparent; 
+    border-left:25px solid rgba(40,40,40,1); 
+}
+
+.arrowContainer {
+    width:100%;
+    height: 100%;
+}
+
+#exitSelected {
+    position:absolute;
+    top:20px;
+    right:100px;
+}
+
+.close {
+  position: absolute;
+  right: 32px;
+  top: 32px;
+  width: 32px;
+  height: 32px;
+  opacity: 0.3;
+}
+.close:hover {
+  opacity: 1;
+}
+.close:before, .close:after {
+  position: absolute;
+  left: 15px;
+  content: ' ';
+  height: 33px;
+  width: 3px;
+  background-color: #fff;
+}
+.close:before {
+  transform: rotate(45deg);
+}
+.close:after {
+  transform: rotate(-45deg);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="gallery" >
+    <h3> Hearthstone photo gallery </h3>
+    <div class="thumbnails">
+        <!--	<img id="img1" src="img/1.png" alt="" />
+        	<img id="img2" src="img/2.png" alt="" />
+        	<img id="img3" src="img/3.png" alt="" />
+        	<img id="img4" src="img/4.png" alt="" />
+        	<img id="img5" src="img/5.png" alt="" /> -->
+    </div>
+    <div class="preview" >
+	    <img id="preview" src="img/1.png" alt=""/>
+    </div>
+</div>
+<div class="selected">
+    <div class="arrowImg">
+        <div class="arrowContainer"> 
+            <div class="arrow-left"></div> 
+            <div class="arrow-left arrow-in-left"></div>
+        </div>
+        <div>
+        <img id="selectedImg" alt="" />
+        <div id="exitSelected" class="close"></div>
+        </div>
+        <div class="arrowContainer">
+            <div class="arrow-right"></div> 
+            <div class="arrow-right arrow-in-right"></div>
+        </div>
+    </div>
+</div>
+     
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    
+    function Gallery(photoSrc){ //array potem
+        photoSrcLength = photoSrc.length;
+        for (var i = 0; i < photoSrcLength; i++){
+            var image = $('<img class="dynamic" alt=""/>');
+            image.attr('src',photoSrc[i]);
+            image.appendTo('.thumbnails');   
+        }
+        
+        function changeImg(imgArray,imgId,changeIndex){
+            var imgIdSrc = $(imgId).attr('src');
+            var indexImg = imgArray.indexOf(imgIdSrc);
+            $(imgId).attr('src', imgArray[indexImg+changeIndex]);
+        }
+        
+        $(document).on("keydown",function(e) { 
+            if (e.which == 37) { //lewo
+                if ( $('.selected').is(':visible')) {
+                    changeImg(photoSrc,'#selectedImg',-1);
+                } 
+                else {
+                    changeImg(photoSrc,'#preview',-1);
+                }
+            }
+            else if (e.which == 39) { //prawo
+                if ( $('.selected').is(':visible')) {
+                    changeImg(photoSrc,'#selectedImg',+1);
+                }
+                else {
+                    changeImg(photoSrc,'#preview',+1);
+                }
+            }
+        });
+        $("img").mouseover(function(){
+        var imgSrc = $(this).attr('src');
+        $('.preview img').attr('src', imgSrc); 
+    });  
+    
+    $('.selected').click(function(e) { // zamykanie zdjecia na srodku ze strza³kami
+        if ( $(e.target).is('.selected') ||  $(e.target).is('.close')  ){
+            $('.selected').css('display', 'none');
+        }
+    });
+    
+    $("img").on({
+        mouseenter: function(){
+            var imgSrc = $(this).attr('src');
+            console.log(imgSrc);
+            $('.preview img').attr('src', imgSrc); 
+            $('.preview').css('display','block');
+        },
+        click: function(){
+            //$('.preview').css('display','none');
+            $('.selected').css('display', 'block'); // pokazuje czarne t³o i wszystko w nim
+            var imgSrc = $(this).attr('src');
+            $('#selectedImg').attr('src', imgSrc);
+        }
+    });
+    
+    $('.arrow-left').on('click', function() {
+        changeImg(photoSrc,'#selectedImg',-1);        
+    });
+    $('.arrow-right').on('click', function() {
+        changeImg(photoSrc,'#selectedImg',+1);        
+    });
+    
+        
+    }
+    
+Gallery(['img/1.png','img/2.png','img/3.png','img/4.png','img/5.png','img/6.png','img/7.png','img/8.png','img/9.png','img/10.png','img/11.png']);
+    
+    
+});
+
+// strza³ki w osobnych divach zeby nie zaznaczac zdjêcia
+// kó³ko myszy zmiania zdjecia
+// zamykanie (krzyzyk po prawej na górze)
+
+</script>
+
+</body>
+</html>
